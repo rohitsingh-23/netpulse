@@ -7,7 +7,9 @@ A lightweight, privacy-first network monitoring application that lives in the ma
 - **Native macOS Notifications (`UserNotifications.framework`)** — modern, proactive alerts for connection lifecycle (connected, disconnected, changed, restored), weak Wi-Fi signal, speed spikes, and data usage thresholds using `UNUserNotificationCenter`
 - **Rate-Limiting & Anti-Spam Architecture** — per-event cooldowns, payload deduplication, and dual-boundary hysteresis (e.g. weak signal trigger $\le -75$ dBm, recovery $\ge -70$ dBm)
 - **User-Configurable Alerts** — granular toggles and thresholds in the Settings dashboard tab and quick toggle in the menu bar
-
+- **In-Dashboard Speed Test** — on-demand testing of download/upload throughput and latency using Cloudflare's speed-test service, with test traffic strictly isolated from normal NetPulse network monitoring and accounting
+- **Help, Troubleshooting & About** — built-in offline guides, FAQ, permissions reference, and project diagnostics accessible directly within the dashboard
+- **Manual Release Update Checking** — on-demand GitHub release check performed only when explicitly triggered via "Check for Updates"
 - **Network & Interface Intelligence** — tracks which physical network and adapter is carrying your traffic
 - **CoreWLAN Wi-Fi Telemetry** — exposes signal strength (RSSI), noise, channel number, frequency band (2.4/5/6 GHz), channel width (20–160 MHz), PHY protocol (Wi-Fi 6 / 802.11ax), transmit link rate, and security (WPA2/WPA3)
 - **Networks Dashboard Tab** — dedicated dashboard page featuring an active connection card, RF status, IP addresses, and known historical networks
@@ -17,21 +19,22 @@ A lightweight, privacy-first network monitoring application that lives in the ma
 - **Dual-Scope Accounting (Zero Double Counting)** — cleanly distinguishes per-interface counters from system-wide aggregates
 - **Atomic Database Migration** — upgrades v1 databases automatically on startup, safely placing pre-Phase 6 records into a dedicated `__SYSTEM_LEGACY__` ("System Total (Legacy)") network without rewriting history
 - **macOS Location Services Privacy Compliance** — if Location permission is not granted, gracefully displays `"Wi-Fi Network"` in UI and notifications while keeping all RF physics, interface stats, and live bandwidth operational
-- **100% Offline & Zero ISP Guessing** — offline ISP detection is not supported on macOS. NetPulse never performs external lookups, geolocations, or heuristic guesses for ISPs
+- **100% Offline Monitoring & Zero ISP Guessing** — offline ISP detection is not supported on macOS. NetPulse never performs external lookups, geolocations, or heuristic guesses for ISPs
 - **Interactive Popover & Menu-Bar Display** — live speeds, graph previews, and configuration menus directly in macOS status bar
 - **Dark, Light & System Appearance** — native macOS look and feel across dashboard and popover
 
 
 ## Privacy
 
-NetPulse is **100% local and offline**.
-- No external network requests
-- No telemetry, analytics, or tracking
-- No accounts, cloud sync, or remote dependencies
-- Raw BSSIDs (hardware AP MAC addresses) are never displayed in the UI and are stored only as salted cryptographic hashes
-- NetPulse respects macOS Location Services privacy and never attempts to bypass permission controls
+NetPulse is designed with a **local-first, privacy-first** architecture:
+- NetPulse monitoring, analytics, storage, and telemetry remain entirely local.
+- NetPulse does not send monitoring data, analytics, or telemetry to external services.
+- No accounts, cloud sync, or background tracking.
+- The optional in-dashboard Speed Test makes external network requests to Cloudflare's speed-test service only when the user explicitly starts a test. Speed Test traffic is isolated and excluded from normal NetPulse accounting.
+- Raw BSSIDs (hardware AP MAC addresses) are never displayed in the UI and are stored only as salted cryptographic hashes.
+- NetPulse respects macOS Location Services privacy and never attempts to bypass permission controls.
 
-## Architecture
+## Core Architecture
 
 ```
 PreferencesManager (JSON, ~/Library/Application Support/NetPulse/)
@@ -93,7 +96,7 @@ netpulse/
 │   ├── settings.py           # Settings configuration page
 │   └── popover.py            # PySide6 NetworkPopover
 └── utils/
-    ├── constants.py          # App-wide constants (v0.6.0)
+    ├── constants.py          # App-wide constants
     ├── formatters.py         # Speed/byte formatting
     └── log.py                # Logging configuration
 ```
@@ -107,8 +110,8 @@ netpulse/
 
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd net-plus
+git clone https://github.com/rohitsingh-23/netpulse.git
+cd netpulse
 
 # Create virtual environment
 python3 -m venv .venv
